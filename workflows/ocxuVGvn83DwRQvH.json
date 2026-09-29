@@ -1,37 +1,19 @@
 {
-  "updatedAt": "2026-09-29T04:22:04.866Z",
+  "updatedAt": "2026-09-29T22:11:20.062Z",
   "createdAt": "2026-07-12T19:56:39.287Z",
   "id": "ocxuVGvn83DwRQvH",
-  "name": "rss-feed-demos",
+  "name": "PubMed to Discord (Postgres Dedup)",
   "description": null,
   "active": true,
   "isArchived": false,
   "nodes": [
     {
       "parameters": {
-        "pollTimes": {
-          "item": []
-        },
-        "feedUrl": "https://pubmed.ncbi.nlm.nih.gov/rss/search/1z7zlNEMzQeo5jr3oosSnoCt6fDEG7txHS3xPJpU0bRUEzYEZt/?limit=15&utm_campaign=pubmed-2&fc=20260712175526"
-      },
-      "type": "n8n-nodes-base.rssFeedReadTrigger",
-      "typeVersion": 1,
-      "position": [
-        -48,
-        -256
-      ],
-      "id": "d1785aac-908f-4dd0-9f7d-7693452a27bb",
-      "name": "RSS Feed Trigger",
-      "notesInFlow": true,
-      "notes": "https://lorem-rss.herokuapp.com/feed\n\nhttps://pubmed.ncbi.nlm.nih.gov/rss/search/1z7zlNEMzQeo5jr3oosSnoCt6fDEG7txHS3xPJpU0bRUEzYEZt/?limit=15&utm_campaign=pubmed-2&fc=20260712175526"
-    },
-    {
-      "parameters": {
         "method": "POST",
         "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"content\": \"New paper: {{ $json.title }}\\n\\n{{ $json.content }}\\n\\n{{ $json.link }}\"\n}",
+        "jsonBody": "={{ $json }}",
         "options": {
           "timeout": 10000
         }
@@ -39,8 +21,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        432,
-        -112
+        -1744,
+        320
       ],
       "id": "d24c4efa-5077-4acd-a94f-d89bcc6d1a13",
       "name": "DiscordPOST",
@@ -55,7 +37,7 @@
       "type": "n8n-nodes-base.rssFeedRead",
       "typeVersion": 1.2,
       "position": [
-        48,
+        32,
         -832
       ],
       "id": "41cc8a1e-43c1-456a-954e-33efc1ae0ff5",
@@ -75,7 +57,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        496,
+        480,
         -624
       ],
       "id": "9425599a-8b02-43cd-91d6-5edbae48b7e4",
@@ -90,7 +72,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        640,
+        624,
         -624
       ],
       "id": "142c8f11-20ad-4984-bc0d-acfb03921bad",
@@ -104,7 +86,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        288,
+        272,
         -784
       ],
       "id": "4dbcb2b2-4c82-4cf2-a41f-5c2fc1835e61",
@@ -115,7 +97,7 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -112,
+        -128,
         -832
       ],
       "id": "6a377462-fb4e-4f3f-b407-6b6dc1684a26",
@@ -128,8 +110,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        192,
-        -256
+        -1984,
+        176
       ],
       "id": "87d7db2f-1e1a-43d3-a69c-ef3c1479b824",
       "name": "Loop Over Items1"
@@ -141,8 +123,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        576,
-        -112
+        -1600,
+        320
       ],
       "id": "dba2495f-648b-41d0-9d71-9926e2ddeaed",
       "name": "Wait1",
@@ -152,8 +134,8 @@
       "parameters": {
         "content": "# RSS Read Node\n1. Manual Trigger \n2. RSS Read Node\n-- Contains an RSS link with specified search terms obtained from PubMed.\n-- Pulls 15 most recent pharmacological research on Ketamine (as JSON).\n3. Loop-Over-Items + Post + Wait loop\n--  Can't post 15 items to Discord because of rate limits.\n--  15 posts separated into batches of 1, posted 1 at a time with 0.5s in between posts.\n3. Discord POST\n-- REST API (POST) node \n-- Posts to Discord server via a webhook\n-- JSON is used in body of REST request\n4. Final Output: \n-- 15 posts in a Discord server",
         "height": 480,
-        "width": 1648,
-        "color": 5
+        "width": 2048,
+        "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -166,33 +148,307 @@
     },
     {
       "parameters": {
-        "content": "# RSS Feed Node\n1. RSS Feed Trigger\n-- Runs every minute\n-- Keeps track of previously posted items and only posts new items that hit the feed\n-- RSS link is still set to 15 so maximum output here is 15\n2. Loop-Over-Items + Post + Wait loop\n-- Same deal as above, to work around rate limits.\n3. Final Output\n-- 0-15 posts contingent on new articles entering PubMed matching the RSS links\nsearch terms",
+        "content": "# RSS Feed Node\n1. RSS Feed Trigger\n-- Runs every minute\n-- Keeps track of previously posted items and only posts new items that hit the feed\n-- RSS link is still set to 15 so maximum output here is 15\n2. Loop-Over-Items + Post + Wait loop\n-- Same deal as above, to work around rate limits.\n3. Final Output\n-- 0-15 posts contingent on new articles entering PubMed matching the RSS links\nsearch terms\n\n# ISSUES\n1. RSS feed trigger fails to only post new items\n2. Scheduled trigger workaround also fails to post new items\n\nMy idea ended up being to create a postgres table to persist data and manually filter for diffs\n",
         "height": 480,
         "width": 1648,
-        "color": 6
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2960,
+        128
+      ],
+      "id": "026fd916-98b5-4f8b-a60d-53add3962b59",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "feedUrl": "https://pubmed.ncbi.nlm.nih.gov/rss/search/1z7zlNEMzQeo5jr3oosSnoCt6fDEG7txHS3xPJpU0bRUEzYEZt/?limit=15&utm_campaign=pubmed-2&fc=20260712175526"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2240,
+        192
+      ],
+      "id": "f0bc1f98-427c-42e8-9f11-3207feee6b1e",
+      "name": "RSS Feed Trigger1",
+      "retryOnFail": true,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput",
+      "notes": "PubMed search terms: ketamine\n\nhttps://lorem-rss.herokuapp.com/feed\n\nhttps://pubmed.ncbi.nlm.nih.gov/rss/search/1z7zlNEMzQeo5jr3oosSnoCt6fDEG7txHS3xPJpU0bRUEzYEZt/?limit=15&utm_campaign=pubmed-2&fc=20260712175526"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -2512,
+        688
+      ],
+      "id": "e5f6272a-a00b-42bf-9bea-28e22e64909a",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://pubmed.ncbi.nlm.nih.gov/rss/search/1z7zlNEMzQeo5jr3oosSnoCt6fDEG7txHS3xPJpU0bRUEzYEZt/?limit=15&utm_campaign=pubmed-2&fc=20260712175526",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -2352,
+        688
+      ],
+      "id": "96baed4e-e4f1-43d9-a667-6968850c3170",
+      "name": "RSS Read",
+      "notesInFlow": true,
+      "notes": "PubMed 15 things"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('node');\nconst lastSeen = staticData.lastSeen ? new Date(staticData.lastSeen) : new Date(0);\n\nconst items = $input.all();\n\nconst newItems = items.filter(i => new Date(i.json.pubDate) > lastSeen);\n\nif (items.length) {\n  staticData.lastSeen = new Date(\n    Math.max(...items.map(i => new Date(i.json.pubDate).getTime()))\n  ).toISOString();\n}\n\nreturn newItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2192,
+        688
+      ],
+      "id": "985eaaa3-6963-4fe7-89c6-9b82dfcbe168",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const item = $json;\n\nreturn {\n  json: {\n    content: `New paper: ${item.title}\\n\\n${item.link}`\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1904,
+        736
+      ],
+      "id": "bb456c26-f356-472a-93fd-73e4c7164cea",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE IF NOT EXISTS feed_posted_items (\n  item_id TEXT PRIMARY KEY,\n  posted_at TIMESTAMPTZ NOT NULL DEFAULT now()\n);\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        208,
+        -320
+      ],
+      "id": "5c47f8b6-9be6-4854-b4b2-9e0c48831903",
+      "name": "Ensure Table1",
+      "executeOnce": true,
+      "notesInFlow": true,
+      "credentials": {
+        "postgres": {
+          "id": "Gcc2Z1ogN6OaReI5",
+          "name": "Postgres account 2"
+        }
+      },
+      "notes": "One-time-per-run safety check. IF NOT EXISTS makes this safe to run every execution.\n\nTRUNCATE feed_posted_items;"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT item_id FROM feed_posted_items;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        208,
+        -64
+      ],
+      "id": "d140c7d8-6ae8-45a6-b9b2-f7c66212c5bd",
+      "name": "Get Posted1",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "Gcc2Z1ogN6OaReI5",
+          "name": "Postgres account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const postedRows = $input.all();\nconst postedTitles = new Set(postedRows.map(r => r.json.item_id));\n\nconst rssItems = $('RSS Read3').all();\nconst newItems = rssItems.filter(i => !postedTitles.has(i.json.title));\n\nreturn newItems.map(i => ({ json: i.json }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        -320
+      ],
+      "id": "0aeb9bc8-b5f2-4202-8a7f-655c76a4bb5c",
+      "name": "Diff New Items1",
+      "notesInFlow": true,
+      "alwaysOutputData": false,
+      "notes": "Compares fresh RSS list against everything already in Postgres, by stripped article URL. Works fine on an empty table."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const item = $json;\n\nreturn {\n  json: {\n    content: `New paper: ${item.title}\\n\\n${item.link}`,\n    articleTitle: item.title\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -320
+      ],
+      "id": "b5b8b7ee-7cce-4be3-b922-2afc00f10684",
+      "name": "Format Message1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO feed_posted_items (item_id) VALUES ('{{ $('Format Message1').item.json.articleTitle.replace(/'/g, \"''\") }}') ON CONFLICT (item_id) DO NOTHING;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        1088,
+        -320
+      ],
+      "id": "a421ff3e-1e27-43ae-bd50-761a9231a7b6",
+      "name": "Mark Posted1",
+      "notesInFlow": true,
+      "credentials": {
+        "postgres": {
+          "id": "Gcc2Z1ogN6OaReI5",
+          "name": "Postgres account 2"
+        }
+      },
+      "notes": "Runs AFTER Discord succeeds. Fixed: now uses articleId (not link) and is a real expression (leading =)."
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -112,
+        -304
+      ],
+      "id": "93fbf811-9be0-4138-8683-6916ec513bb1",
+      "name": "Schedule Trigger2"
+    },
+    {
+      "parameters": {
+        "url": "https://pubmed.ncbi.nlm.nih.gov/rss/search/1z7zlNEMzQeo5jr3oosSnoCt6fDEG7txHS3xPJpU0bRUEzYEZt/?limit=5&utm_campaign=pubmed-2&fc=20260712175526",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -96,
+        -48
+      ],
+      "id": "71e7c9af-df21-44ce-80aa-493ce9d452ad",
+      "name": "RSS Read3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        512,
+        -64
+      ],
+      "id": "a3503ade-1f0e-47cb-8d09-553261719df8",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"content\": $json.content } }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        816,
+        -64
+      ],
+      "id": "8ad4014e-0be7-4fdd-91df-f6912a499420",
+      "name": "DiscordPOST3"
+    },
+    {
+      "parameters": {
+        "amount": 0.5
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        -64
+      ],
+      "id": "9676da53-d0de-45ab-b90b-0336fbaa6bf2",
+      "name": "Wait3",
+      "webhookId": "2036bbd6-1cf3-4a5d-9697-034969a09f5e"
+    },
+    {
+      "parameters": {
+        "content": "# RSS Feed Node\nOn a schedule, checks RSS feed for new items, posts them to Discord server\n1. Scheduled trigger runs automaticaly when workflow is published\n2. RSS Read - same deal as above\n3. Ensure Table - creates PostgreSQL table if none exists\n4. Get Posted - pullls all item ID's from database for filtering\n5. Diff New Items - compares new RSS feed IDs against IDs in Postgres, returns diffs\n- Workflow stops if there are no diffs\n6. Loop over items - batches items by 1, loops through each\n7. Format Message - item values used in message template\n8. DiscordPost - REST API (POST) posts message to Discord via webhook\n9. Mark Posted - adds new item IDs to Postgres database\n10. Wait - waits 0.5s per message to avoid rate limits",
+        "height": 480,
+        "width": 2048,
+        "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
         -784,
-        -304
+        -336
       ],
-      "id": "026fd916-98b5-4f8b-a60d-53add3962b59",
-      "name": "Sticky Note1"
+      "id": "74d58ab4-a289-424e-be50-884a331bd90c",
+      "name": "Sticky Note2"
     }
   ],
   "connections": {
-    "RSS Feed Trigger": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "RSS Read1": {
       "main": [
         [
@@ -254,7 +510,7 @@
         [],
         [
           {
-            "node": "DiscordPOST",
+            "node": "Code in JavaScript1",
             "type": "main",
             "index": 0
           }
@@ -282,6 +538,166 @@
           }
         ]
       ]
+    },
+    "RSS Feed Trigger1": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "DiscordPOST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ensure Table1": {
+      "main": [
+        [
+          {
+            "node": "Get Posted1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Posted1": {
+      "main": [
+        [
+          {
+            "node": "Diff New Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Diff New Items1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Message1": {
+      "main": [
+        [
+          {
+            "node": "DiscordPOST3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Posted1": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "RSS Read3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read3": {
+      "main": [
+        [
+          {
+            "node": "Ensure Table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Format Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DiscordPOST3": {
+      "main": [
+        [
+          {
+            "node": "Mark Posted1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -291,7 +707,21 @@
   },
   "staticData": {
     "node:RSS Feed Trigger": {
-      "lastItemDate": "2026-09-28T10:00:00.000Z"
+      "lastItemDate": "2026-09-29T10:00:00.000Z"
+    },
+    "node:RSS Feed Trigger1": {
+      "lastItemDate": "2026-09-29T10:00:00.000Z"
+    },
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
+    },
+    "node:Code in JavaScript": {
+      "lastSeen": "2026-09-29T10:00:00.000Z"
     }
   },
   "meta": {
@@ -299,9 +729,9 @@
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "4c590061-12eb-4e39-8a71-e088dcb660f9",
-  "activeVersionId": "4c590061-12eb-4e39-8a71-e088dcb660f9",
-  "versionCounter": 333,
+  "versionId": "2dbf48cf-9f5b-4200-ba68-0c280b5ee6ad",
+  "activeVersionId": "751a294f-2849-43b1-bfd8-7f7c876276e6",
+  "versionCounter": 593,
   "triggerCount": 1,
   "sourceWorkflowId": null,
   "tags": [],
@@ -326,7 +756,7 @@
     }
   ],
   "versionMetadata": {
-    "name": "Version 4c590061",
-    "description": ""
+    "name": null,
+    "description": null
   }
 }
