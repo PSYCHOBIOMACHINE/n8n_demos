@@ -1,0 +1,332 @@
+{
+  "updatedAt": "2026-09-29T04:22:04.866Z",
+  "createdAt": "2026-07-12T19:56:39.287Z",
+  "id": "ocxuVGvn83DwRQvH",
+  "name": "rss-feed-demos",
+  "description": null,
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": []
+        },
+        "feedUrl": "https://pubmed.ncbi.nlm.nih.gov/rss/search/1z7zlNEMzQeo5jr3oosSnoCt6fDEG7txHS3xPJpU0bRUEzYEZt/?limit=15&utm_campaign=pubmed-2&fc=20260712175526"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -256
+      ],
+      "id": "d1785aac-908f-4dd0-9f7d-7693452a27bb",
+      "name": "RSS Feed Trigger",
+      "notesInFlow": true,
+      "notes": "https://lorem-rss.herokuapp.com/feed\n\nhttps://pubmed.ncbi.nlm.nih.gov/rss/search/1z7zlNEMzQeo5jr3oosSnoCt6fDEG7txHS3xPJpU0bRUEzYEZt/?limit=15&utm_campaign=pubmed-2&fc=20260712175526"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"New paper: {{ $json.title }}\\n\\n{{ $json.content }}\\n\\n{{ $json.link }}\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        -112
+      ],
+      "id": "d24c4efa-5077-4acd-a94f-d89bcc6d1a13",
+      "name": "DiscordPOST",
+      "notesInFlow": true,
+      "notes": "Sends final payload from previous message to discord server via webhook.\n\nWill have to add discord webhook as an env variable. It highlights red but still works. "
+    },
+    {
+      "parameters": {
+        "url": "https://pubmed.ncbi.nlm.nih.gov/rss/search/1z7zlNEMzQeo5jr3oosSnoCt6fDEG7txHS3xPJpU0bRUEzYEZt/?limit=15&utm_campaign=pubmed-2&fc=20260712175526",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        -832
+      ],
+      "id": "41cc8a1e-43c1-456a-954e-33efc1ae0ff5",
+      "name": "RSS Read1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"New paper: {{ $json.title }}\\n\\n{{ $json.content }}\\n\\n{{ $json.link }}\"\n}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        496,
+        -624
+      ],
+      "id": "9425599a-8b02-43cd-91d6-5edbae48b7e4",
+      "name": "DiscordPOST1",
+      "notesInFlow": true,
+      "notes": "Sends final payload from previous message to discord server via webhook.\n\nWill have to add discord webhook as an env variable. It highlights red but still works. "
+    },
+    {
+      "parameters": {
+        "amount": 0.5
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        640,
+        -624
+      ],
+      "id": "142c8f11-20ad-4984-bc0d-acfb03921bad",
+      "name": "Wait",
+      "webhookId": "4ebb35ab-2138-4a14-9aca-4a96942dec69"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        288,
+        -784
+      ],
+      "id": "4dbcb2b2-4c82-4cf2-a41f-5c2fc1835e61",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        -832
+      ],
+      "id": "6a377462-fb4e-4f3f-b407-6b6dc1684a26",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        192,
+        -256
+      ],
+      "id": "87d7db2f-1e1a-43d3-a69c-ef3c1479b824",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "amount": 0.5
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        576,
+        -112
+      ],
+      "id": "dba2495f-648b-41d0-9d71-9926e2ddeaed",
+      "name": "Wait1",
+      "webhookId": "4ebb35ab-2138-4a14-9aca-4a96942dec69"
+    },
+    {
+      "parameters": {
+        "content": "# RSS Read Node\n1. Manual Trigger \n2. RSS Read Node\n-- Contains an RSS link with specified search terms obtained from PubMed.\n-- Pulls 15 most recent pharmacological research on Ketamine (as JSON).\n3. Loop-Over-Items + Post + Wait loop\n--  Can't post 15 items to Discord because of rate limits.\n--  15 posts separated into batches of 1, posted 1 at a time with 0.5s in between posts.\n3. Discord POST\n-- REST API (POST) node \n-- Posts to Discord server via a webhook\n-- JSON is used in body of REST request\n4. Final Output: \n-- 15 posts in a Discord server",
+        "height": 480,
+        "width": 1648,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        -864
+      ],
+      "id": "0aa355fd-d79b-417f-a3d7-e90344a987f7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# RSS Feed Node\n1. RSS Feed Trigger\n-- Runs every minute\n-- Keeps track of previously posted items and only posts new items that hit the feed\n-- RSS link is still set to 15 so maximum output here is 15\n2. Loop-Over-Items + Post + Wait loop\n-- Same deal as above, to work around rate limits.\n3. Final Output\n-- 0-15 posts contingent on new articles entering PubMed matching the RSS links\nsearch terms",
+        "height": 480,
+        "width": 1648,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        -304
+      ],
+      "id": "026fd916-98b5-4f8b-a60d-53add3962b59",
+      "name": "Sticky Note1"
+    }
+  ],
+  "connections": {
+    "RSS Feed Trigger": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "DiscordPOST1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DiscordPOST1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "RSS Read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "DiscordPOST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DiscordPOST": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": {
+    "node:RSS Feed Trigger": {
+      "lastItemDate": "2026-09-28T10:00:00.000Z"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "4c590061-12eb-4e39-8a71-e088dcb660f9",
+  "activeVersionId": "4c590061-12eb-4e39-8a71-e088dcb660f9",
+  "versionCounter": 333,
+  "triggerCount": 1,
+  "sourceWorkflowId": null,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-07-12T19:56:39.287Z",
+      "createdAt": "2026-07-12T19:56:39.287Z",
+      "role": "workflow:owner",
+      "workflowId": "ocxuVGvn83DwRQvH",
+      "projectId": "eav1eB5Fr16yxNoR",
+      "project": {
+        "updatedAt": "2026-07-12T19:53:55.870Z",
+        "createdAt": "2026-07-12T19:44:12.406Z",
+        "id": "eav1eB5Fr16yxNoR",
+        "name": "name name <n8nemail@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "customTelemetryTags": [],
+        "creatorId": "32366956-d3af-4296-a820-49bad67bc659"
+      }
+    }
+  ],
+  "versionMetadata": {
+    "name": "Version 4c590061",
+    "description": ""
+  }
+}
