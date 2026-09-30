@@ -1,5 +1,6 @@
+# n8n Automations⚡️
 ![n8n Banner](assets/n8n-banner.png)
-# Getting Started
+## Getting Started
 Clone the repo as usual.
 
 ## Getting Started with Docker
