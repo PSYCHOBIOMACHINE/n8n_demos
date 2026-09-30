@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-29T22:11:20.062Z",
+  "updatedAt": "2026-09-30T20:38:03.857Z",
   "createdAt": "2026-07-12T19:56:39.287Z",
   "id": "ocxuVGvn83DwRQvH",
   "name": "PubMed to Discord (Postgres Dedup)",
@@ -57,8 +57,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        480,
-        -624
+        672,
+        -544
       ],
       "id": "9425599a-8b02-43cd-91d6-5edbae48b7e4",
       "name": "DiscordPOST1",
@@ -72,8 +72,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        624,
-        -624
+        848,
+        -768
       ],
       "id": "142c8f11-20ad-4984-bc0d-acfb03921bad",
       "name": "Wait",
@@ -253,7 +253,7 @@
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "CREATE TABLE IF NOT EXISTS feed_posted_items (\n  item_id TEXT PRIMARY KEY,\n  posted_at TIMESTAMPTZ NOT NULL DEFAULT now()\n);\n\n",
+        "query": "TRUNCATE feed_posted_items;\n\nCREATE TABLE IF NOT EXISTS feed_posted_items (\n  item_id TEXT PRIMARY KEY,\n  posted_at TIMESTAMPTZ NOT NULL DEFAULT now()\n);\n\n",
         "options": {}
       },
       "type": "n8n-nodes-base.postgres",
@@ -268,8 +268,8 @@
       "notesInFlow": true,
       "credentials": {
         "postgres": {
-          "id": "Gcc2Z1ogN6OaReI5",
-          "name": "Postgres account 2"
+          "id": "Z82hYFVr5IgTu4q1",
+          "name": "Postgres account"
         }
       },
       "notes": "One-time-per-run safety check. IF NOT EXISTS makes this safe to run every execution.\n\nTRUNCATE feed_posted_items;"
@@ -292,8 +292,8 @@
       "alwaysOutputData": true,
       "credentials": {
         "postgres": {
-          "id": "Gcc2Z1ogN6OaReI5",
-          "name": "Postgres account 2"
+          "id": "Z82hYFVr5IgTu4q1",
+          "name": "Postgres account"
         }
       }
     },
@@ -344,8 +344,8 @@
       "notesInFlow": true,
       "credentials": {
         "postgres": {
-          "id": "Gcc2Z1ogN6OaReI5",
-          "name": "Postgres account 2"
+          "id": "Z82hYFVr5IgTu4q1",
+          "name": "Postgres account"
         }
       },
       "notes": "Runs AFTER Discord succeeds. Fixed: now uses articleId (not link) and is a real expression (leading =)."
@@ -411,8 +411,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        816,
-        -64
+        832,
+        192
       ],
       "id": "8ad4014e-0be7-4fdd-91df-f6912a499420",
       "name": "DiscordPOST3"
@@ -446,6 +446,74 @@
       ],
       "id": "74d58ab4-a289-424e-be50-884a331bd90c",
       "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{ JSON.stringify( $json.content ) }}",
+        "options": {},
+        "embeds": {
+          "values": []
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -48
+      ],
+      "id": "ed1a0a59-7aee-495d-9f50-795df5d23a73",
+      "name": "Send a message",
+      "webhookId": "905c8b69-5d9d-4d37-867a-c0b5ea361a36",
+      "notesInFlow": true,
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "h33wnZmhXZ6sZNVi",
+          "name": "Discord Webhook account"
+        }
+      },
+      "notes": "Sends final payload from previous message to discord server via Webhook.\n\nNeed to set up webhook credential"
+    },
+    {
+      "parameters": {
+        "authentication": "webhook",
+        "content": "={{ JSON.stringify( $json.content ) }}",
+        "options": {},
+        "embeds": {
+          "values": []
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -768
+      ],
+      "id": "e3b71881-e857-4a46-8aa5-82386dd9f190",
+      "name": "Send a message1",
+      "webhookId": "905c8b69-5d9d-4d37-867a-c0b5ea361a36",
+      "notesInFlow": true,
+      "credentials": {
+        "discordWebhookApi": {
+          "id": "h33wnZmhXZ6sZNVi",
+          "name": "Discord Webhook account"
+        }
+      },
+      "notes": "Sends final payload from previous message to discord server via Webhook.\n\nNeed to set up webhook credential"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const item = $json;\n\nreturn {\n  json: {\n    content: `New paper: ${item.title}\\n\\n${item.link}`,\n    articleTitle: item.title\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -768
+      ],
+      "id": "b6025029-5112-43dd-b1fa-a0333907c384",
+      "name": "Format Message"
     }
   ],
   "connections": {
@@ -476,7 +544,7 @@
         [],
         [
           {
-            "node": "DiscordPOST1",
+            "node": "Format Message",
             "type": "main",
             "index": 0
           }
@@ -485,13 +553,7 @@
     },
     "DiscordPOST1": {
       "main": [
-        [
-          {
-            "node": "Wait",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "When clicking ‘Execute workflow’": {
@@ -625,7 +687,7 @@
       "main": [
         [
           {
-            "node": "DiscordPOST3",
+            "node": "Send a message",
             "type": "main",
             "index": 0
           }
@@ -679,6 +741,22 @@
     },
     "DiscordPOST3": {
       "main": [
+        []
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
         [
           {
             "node": "Mark Posted1",
@@ -688,11 +766,22 @@
         ]
       ]
     },
-    "Wait3": {
+    "Send a message1": {
       "main": [
         [
           {
-            "node": "Loop Over Items3",
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
             "type": "main",
             "index": 0
           }
@@ -710,7 +799,7 @@
       "lastItemDate": "2026-09-29T10:00:00.000Z"
     },
     "node:RSS Feed Trigger1": {
-      "lastItemDate": "2026-09-29T10:00:00.000Z"
+      "lastItemDate": "2026-09-30T10:00:00.000Z"
     },
     "node:Schedule Trigger": {
       "recurrenceRules": [
@@ -722,6 +811,14 @@
     },
     "node:Code in JavaScript": {
       "lastSeen": "2026-09-29T10:00:00.000Z"
+    },
+    "node:Schedule Trigger2": {
+      "recurrenceRules": [
+        null
+      ],
+      "recurrenceRuleSignatures": [
+        null
+      ]
     }
   },
   "meta": {
@@ -729,34 +826,34 @@
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "2dbf48cf-9f5b-4200-ba68-0c280b5ee6ad",
-  "activeVersionId": "751a294f-2849-43b1-bfd8-7f7c876276e6",
-  "versionCounter": 593,
-  "triggerCount": 1,
+  "versionId": "d3d6541d-033f-497c-8ead-a22d9bec1e98",
+  "activeVersionId": "d3d6541d-033f-497c-8ead-a22d9bec1e98",
+  "versionCounter": 636,
+  "triggerCount": 2,
   "sourceWorkflowId": null,
   "tags": [],
   "shared": [
     {
-      "updatedAt": "2026-07-12T19:56:39.287Z",
-      "createdAt": "2026-07-12T19:56:39.287Z",
+      "updatedAt": "2026-09-30T19:17:35.310Z",
+      "createdAt": "2026-09-30T19:17:35.310Z",
       "role": "workflow:owner",
       "workflowId": "ocxuVGvn83DwRQvH",
-      "projectId": "eav1eB5Fr16yxNoR",
+      "projectId": "iduounjyVluqXhJc",
       "project": {
-        "updatedAt": "2026-07-12T19:53:55.870Z",
-        "createdAt": "2026-07-12T19:44:12.406Z",
-        "id": "eav1eB5Fr16yxNoR",
-        "name": "name name <n8nemail@gmail.com>",
+        "updatedAt": "2026-09-30T19:01:23.665Z",
+        "createdAt": "2026-09-30T18:59:24.377Z",
+        "id": "iduounjyVluqXhJc",
+        "name": "manayme jev <n8nemail@gmail.com>",
         "type": "personal",
         "icon": null,
         "description": null,
         "customTelemetryTags": [],
-        "creatorId": "32366956-d3af-4296-a820-49bad67bc659"
+        "creatorId": "ffd95d08-e900-4a71-bb7f-d98d0836c028"
       }
     }
   ],
   "versionMetadata": {
-    "name": null,
-    "description": null
+    "name": "Version d3d6541d",
+    "description": ""
   }
 }

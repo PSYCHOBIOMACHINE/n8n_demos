@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-29T04:23:49.060Z",
+  "updatedAt": "2026-09-30T20:28:08.477Z",
   "createdAt": "2026-07-17T21:06:06.580Z",
   "id": "HJzo6MZ9UYwsJL4f",
   "name": "ai-stocks-finnhub",
@@ -62,14 +62,12 @@
     {
       "parameters": {
         "url": "=https://finnhub.io/api/v1/quote?symbol={{ $json.symbol }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "X-Finnhub-Token",
-              "value": "={{ 'x-finnhub-token' }}"
+              "value": "={{ $env.FINNHUB_API_KEY }}"
             }
           ]
         },
@@ -83,13 +81,8 @@
       ],
       "id": "7067b2a0-ffaa-471e-aece-6e07a4d4138e",
       "name": "FinnHubb",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "6sTzcWDQJZQ4xWVN",
-          "name": "Header Auth account"
-        }
-      },
-      "notes": "An API call is made for every symbol in `tickerArr`"
+      "notesInFlow": true,
+      "notes": "An API call is made for every symbol in `tickerArr`\n\nIf using n8n credential for finnhub api key:\nset Authentication to general credential type, add `{{ 'x-finnhub-token' }}`"
     },
     {
       "parameters": {
@@ -154,7 +147,8 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.DISCORD_WEBHOOK_URL }}",
+        "url": "={{  }}",
+        "authentication": "predefinedCredentialType",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{  $json  }}",
@@ -163,8 +157,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        864,
-        -304
+        880,
+        -80
       ],
       "id": "575b03df-3bef-41c2-98e5-6b0f6d25972d",
       "name": "DiscordPOST",
@@ -205,12 +199,13 @@
     {
       "parameters": {
         "authentication": "webhook",
+        "content": "={{ $json.content }}",
         "options": {},
         "embeds": {
           "values": [
             {
               "inputMethod": "json",
-              "json": "={{ JSON.stringify($json.embeds) }}"
+              "json": "={{ JSON.stringify($json.embeds[0]) }}"
             }
           ]
         }
@@ -219,7 +214,7 @@
       "typeVersion": 2,
       "position": [
         880,
-        -64
+        -304
       ],
       "id": "33aa5b99-d67b-42af-80b0-352c2f51087d",
       "name": "Send a message",
@@ -227,11 +222,11 @@
       "notesInFlow": true,
       "credentials": {
         "discordWebhookApi": {
-          "id": "cTfeOUaHmjfolC2p",
+          "id": "h33wnZmhXZ6sZNVi",
           "name": "Discord Webhook account"
         }
       },
-      "notes": "sometimes it refuses the webhook, sometimes it refuses the embed. i'd have to spend some time figuring it out."
+      "notes": "Sends final payload from previous message to discord server via Webhook.\n\nNeed to set up webhook credential"
     }
   ],
   "connections": {
@@ -283,7 +278,7 @@
       "main": [
         [
           {
-            "node": "DiscordPOST",
+            "node": "Send a message",
             "type": "main",
             "index": 0
           }
@@ -329,34 +324,34 @@
   },
   "nodeGroups": [],
   "pinData": {},
-  "versionId": "11e59d8a-37cb-464f-bb80-a81d38887bef",
-  "activeVersionId": "11e59d8a-37cb-464f-bb80-a81d38887bef",
-  "versionCounter": 518,
+  "versionId": "549c1943-46de-4ffd-afa3-92db347838d8",
+  "activeVersionId": "9e171caf-8a60-48c5-a8c3-ee1cc6d86dbb",
+  "versionCounter": 577,
   "triggerCount": 1,
   "sourceWorkflowId": null,
   "tags": [],
   "shared": [
     {
-      "updatedAt": "2026-07-17T21:06:06.580Z",
-      "createdAt": "2026-07-17T21:06:06.580Z",
+      "updatedAt": "2026-09-30T19:17:35.310Z",
+      "createdAt": "2026-09-30T19:17:35.310Z",
       "role": "workflow:owner",
       "workflowId": "HJzo6MZ9UYwsJL4f",
-      "projectId": "eav1eB5Fr16yxNoR",
+      "projectId": "iduounjyVluqXhJc",
       "project": {
-        "updatedAt": "2026-07-12T19:53:55.870Z",
-        "createdAt": "2026-07-12T19:44:12.406Z",
-        "id": "eav1eB5Fr16yxNoR",
-        "name": "name name <n8nemail@gmail.com>",
+        "updatedAt": "2026-09-30T19:01:23.665Z",
+        "createdAt": "2026-09-30T18:59:24.377Z",
+        "id": "iduounjyVluqXhJc",
+        "name": "manayme jev <n8nemail@gmail.com>",
         "type": "personal",
         "icon": null,
         "description": null,
         "customTelemetryTags": [],
-        "creatorId": "32366956-d3af-4296-a820-49bad67bc659"
+        "creatorId": "ffd95d08-e900-4a71-bb7f-d98d0836c028"
       }
     }
   ],
   "versionMetadata": {
-    "name": "Version 11e59d8a",
-    "description": ""
+    "name": null,
+    "description": null
   }
 }
