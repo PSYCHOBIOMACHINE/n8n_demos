@@ -36,8 +36,8 @@ ls <PATH/TO/WORKFLOWS/FOLDER>
 ```
 The last command confirms that the files were copied to the workflows folder.
 
-## Getting started with n8n (locally)
-You should have 2 containers: one for *n8n* and one for *n8n-db* (PostgreSQL database). Once the containers are live you can go to `localhost:5678` to visit the app.
+## Getting Started With n8n (Locally)
+You should have 2 containers: one for **n8n** and one for **n8n-db** (PostgreSQL database). Once the containers are live you can go to `localhost:5678` to visit the app.
 
 ### Add `Credentials`
 Nodes often use API's and Webhooks. It's better to set them up as `credentials` instead of putting them directly into nodes because including them directly in nodes will also include them in plain JSON when exporting your workflow.
