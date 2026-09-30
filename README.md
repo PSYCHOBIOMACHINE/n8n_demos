@@ -1,3 +1,4 @@
+![n8n Banner](assets/n8n-banner.png)
 # Getting Started
 Clone the repository as usual.
 
