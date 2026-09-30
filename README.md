@@ -34,7 +34,7 @@ docker cp <n8n-CONTAINER-NAME>:/tmp/workflows/. <PATH/TO/WORKFLOWS/FOLDER>
 
 ls <PATH/TO/WORKFLOWS/FOLDER>
 ```
-The last command confirms that the files were copied to the workflows folder.
+The last command tells you what files are in the workflows folder.
 
 ## Getting Started With n8n (Locally)
 You should have 2 containers: one for **n8n** and one for **n8n-db** (PostgreSQL database). Once the containers are live, you can go to `localhost:5678` to visit the app.
