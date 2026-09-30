@@ -13,7 +13,7 @@ If you need to install Docker, here are two common options:
 ### Spin Up Docker Containers
 The complete configuration is ready in `docker-compose.yml`.
 
-From code editor, change to the project root and run:
+From your code editor, change to the project root and run:
 ```
 docker compose up -d
 ```
