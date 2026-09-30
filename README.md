@@ -3,7 +3,7 @@
 ## Getting Started
 Clone the repo as usual.
 
-## 🐳 Getting Started with Docker
+## Getting Started with Docker 🐳
 If you need to install Docker, here are two common options:
 
 1. Download Docker Desktop and follow installation instructions. 
