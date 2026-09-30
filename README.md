@@ -1,22 +1,22 @@
 ![n8n Banner](assets/n8n-banner.png)
 # Getting Started
-Clone the repository as usual.
+Clone the repo as usual.
 
 ## Getting Started with Docker
 If you need to install Docker, here are two common options:
 
-1. Download Docker Desktop and follow installation instructions (simplest) 
-   This lets you easily manage images and containers through Docker Desktop's GUI.
-2. Install Docker (engine and CLI) through the terminal and install the `Container Tools` extension in VS Code (or an equivalent extension in another code editor). This provides an interface for managing images and containers.
+1. Download Docker Desktop and follow installation instructions. 
+   This lets you easily manage images and containers through Docker Desktop's GUI. This is generally the simplest way to get started with Docker, but you will still need to go to your code editor for this project since it involves a using a compose file from a Github repo.
+2. Install Docker (engine and CLI) through the terminal and install the `Container Tools` extension in VS Code (or an equivalent extension in another code editor). `Container Tools` provides an interface for managing images and containers.
 
 ### Spin Up Docker Containers
 The complete configuration is ready in `docker-compose.yml`.
 
-Change to the project root and run:
+From code editor, change to the project root and run:
 ```
 docker compose up -d
 ```
-Note: You will need to configure credentials, such as the Discord webhook and Finnhub API key, in the n8n app.
+Note: You will need to configure `credentials`, such as the Discord webhook and Finnhub API key, in the n8n app.
 
 ### Import Workflows
 ```
@@ -35,6 +35,14 @@ docker cp <n8n-CONTAINER-NAME>:/tmp/workflows/. <PATH/TO/WORKFLOWS/FOLDER>
 ls <PATH/TO/WORKFLOWS/FOLDER>
 ```
 The last command confirms that the files were copied to the workflows folder.
+
+## Getting started with n8n (locally)
+You should have 2 containers one for n8n and one for n8n-db (PostgreSQL database). Once the containers are live you can go to `localhost:5678` to visit the app.
+
+### Add `Credentials`
+Nodes often use API's and Webhooks. It's better to set them up as `credentials` instead of putting them directly into nodes because including them directly in nodes will also include them in plain JSON when exporting your workflow.
+
+These demos specifically use a FinnHub API key (free), and a Discord webhook (free).
 
 ## Demo Workflows
 ### Scheduled API Call Example
