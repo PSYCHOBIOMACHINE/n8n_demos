@@ -1,4 +1,4 @@
-# n8n Automations⚡️
+# ⚡️ n8n Automations ⚡️
 ![n8n Banner](assets/n8n-banner.png)
 ## Getting Started
 Clone the repo as usual.
