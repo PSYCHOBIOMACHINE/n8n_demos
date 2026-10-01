@@ -41,7 +41,7 @@ The last command tells you what files are in the `/workflows` folder.
 You should have 2 containers: one for **n8n** and one for **n8n-db** (PostgreSQL database). Once the containers are live, you can go to `localhost:5678` to visit the app.
 
 ### Add `Credentials`
-Nodes often use API's and Webhooks. It's better to set them up as `credentials` instead of putting them directly into nodes because including them directly in nodes will also include them in plain JSON when you export your workflow.
+Nodes often use API's and Webhooks. It's better to set them up as `credentials` instead of putting them directly into nodes because including them directly in nodes will also include them in plain JSON when you export your workflow. Using a `.env` file, and calling on env vars is also an option. You would have to adjust the n8n service in the Docker compose to import the env vars, and to allow nodes to access env vars. 
 
 These demos use a FinnHub API key (free), and a Discord webhook (free).
 
