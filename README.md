@@ -43,7 +43,7 @@ You should have 2 containers: one for **n8n** and one for **n8n-db** (PostgreSQL
 ### Add `Credentials`
 Nodes often use API's and Webhooks. It's better to set them up as `credentials` instead of putting them directly into nodes because including them directly in nodes will also include them in plain JSON when you export your workflow.
 
-These demos specifically use a FinnHub API key (free), and a Discord webhook (free).
+These demos use a FinnHub API key (free), and a Discord webhook (free).
 
 ## Demo Workflows
 ### Scheduled API Call Example
