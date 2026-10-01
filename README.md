@@ -56,6 +56,6 @@ Pulling opening and closing data for an AI stocks watchlist at market close, the
 *Screenshot of the node and edge configuration.*
 
 ### Scheduled RSS Feed Example
-![PubMed RSS-to-Discord workflow](assets/n8n-pubmedRSS-discord.png)
+![PubMed RSS-to-Discord workflow](assets/n8n-pubmed-RSS-discord.png)
 *Screenshot of the node and edge configuration.*
 *Check the Postgres node `ENSURE TABLE` if it includes the `truncate table` line. If present, remove it. That line is just for troubleshooting and clears all previous data. With it, the automation never recognizes diffs and reposts the same content over and over again.*
