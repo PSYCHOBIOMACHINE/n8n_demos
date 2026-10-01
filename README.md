@@ -7,7 +7,7 @@ Clone the repo as usual.
 If you need to install Docker, here are two common options:
 
 1. Download Docker Desktop and follow installation instructions. 
-   This lets you easily manage images and containers through Docker Desktop's GUI. This is generally the simplest way to get started with Docker, but you will still need to go to your code editor for this project since it involves a using a compose file from a Github repo.
+   This lets you easily manage images and containers through Docker Desktop's GUI. This is generally the simplest way to get started with Docker, but you will still want to go to your code editor for this project since it involves cloning a repo and using a compose file.
 2. Install Docker (engine and CLI) through the terminal and install the `Container Tools` extension in VS Code (or an equivalent extension in another code editor). `Container Tools` provides an interface for managing images and containers.
 
 ### Spin Up Docker Containers
